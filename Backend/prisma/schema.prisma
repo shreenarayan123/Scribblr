@@ -1,0 +1,100 @@
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String     @id @default(uuid())
+  email     String
+  name      String?
+  password  String
+  bio       String?    @default("An anonymous user | author")
+  img       String?
+  posts     Post[]     @relation("UserPosts", map: "UserPostsRelation")
+  followers Follower[] @relation("UserFollowers", map: "UserFollowersRelation")
+  following Follower[] @relation("UserFollowing", map: "UserFollowingRelation")
+  bookmarks Bookmark[] @relation("UserBookmarks", map: "UserBookmarksRelation")
+  claps     Clap[]
+  comments  Comment[]
+}
+
+model Post {
+  id            String       @id @default(uuid())
+  title         String
+  content       String
+  publishedDate DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  published     Boolean      @default(false)
+  author        User         @relation("UserPosts", fields: [authorId], references: [id], map: "PostAuthorRelation")
+  authorId      String
+  img           String?
+  bookmarks     Bookmark[]   @relation("PostBookmarks", map: "PostBookmarksRelation")
+  tags          TagsOnPost[]
+  claps         Clap[]
+  comments      Comment[]
+}
+
+model Clap {
+  id        String   @id @default(uuid())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId    String
+  comment   Comment? @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  commentId String?
+}
+
+model Comment {
+  id        String    @id @default(uuid())
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String
+  post      Post      @relation(fields: [postId], references: [id], onDelete: Cascade)
+  postId    String
+  message   String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  parent    Comment?  @relation("ParentChild", fields: [parentId], references: [id], onDelete: Cascade)
+  children  Comment[] @relation("ParentChild")
+  parentId  String?
+  claps     Clap[]
+}
+
+model Follower {
+  id         String @id @default(uuid())
+  follower   User   @relation("UserFollowing", fields: [followerId], references: [id], map: "FollowerRelation")
+  followerId String
+  followee   User   @relation("UserFollowers", fields: [followeeId], references: [id], map: "FolloweeRelation")
+  followeeId String
+
+  @@unique([followerId, followeeId], map: "UniqueFollowers")
+}
+
+model Bookmark {
+  id     String @id @default(uuid())
+  user   User   @relation("UserBookmarks", fields: [userId], references: [id], map: "UserBookmarkRelation")
+  userId String
+  post   Post   @relation("PostBookmarks", fields: [postId], references: [id], map: "PostBookmarkRelation")
+  postId String
+
+  @@unique([userId, postId], map: "UniqueBookmarks")
+}
+
+model Tag {
+  id         String       @id @default(uuid())
+  topic      String
+  tagId      String
+  tagsOnPost TagsOnPost[]
+}
+
+model TagsOnPost {
+  id     String @id @default(uuid())
+  tag    Tag    @relation(fields: [tagId], references: [id])
+  tagId  String
+  post   Post   @relation(fields: [postId], references: [id])
+  postId String
+}
