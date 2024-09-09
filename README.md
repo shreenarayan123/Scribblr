@@ -8,9 +8,7 @@
 <!-- PROJECT LOGO -->
 <br />
 <div align="center">
-  <a href="https://github.com/aadeshkulkarni/medium-app">
     <img src="Frontend/src/assets/logo.png" alt="Logo" width="40%">
-  </a>
 
 
   <p align="center">
