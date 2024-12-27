@@ -1,7 +1,7 @@
 import { AtomEffect, atomFamily } from "recoil";
 import { recoilPersist } from "recoil-persist";
 
-const { persistAtom } = recoilPersist({
+recoilPersist({
   key: "user-interactions",
   storage: localStorage,
 });
@@ -25,7 +25,7 @@ const localStorageEffect =
 
 export const followAtomFamily = atomFamily<boolean, string>({
   key: "followAtomFamily",
-  default: (followeeId: string) => false,
+  default: () => false,
   effects_UNSTABLE: (followeeId: string) => [
     localStorageEffect(`follow_${followeeId}`),
   ],
@@ -33,13 +33,13 @@ export const followAtomFamily = atomFamily<boolean, string>({
 
 export const bookmarkAtomFamily = atomFamily({
   key: "bookmarkAtomFamily",
-  default: (blogId: string) => false,
+  default: () => false,
   effects_UNSTABLE: (blogId: string) => [
     localStorageEffect(`bookmark_${blogId}`),
   ],
 });
 export const clapAtomFamily = atomFamily({
   key: "clapAtomFamily",
-  default: (blogId: string) => false,
+  default: () => false,
   effects_UNSTABLE: (blogId: string) => [localStorageEffect(`clap_${blogId}`)],
 });
