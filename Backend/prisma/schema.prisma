@@ -1,4 +1,3 @@
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -17,10 +16,11 @@ model User {
   img       String?
   posts     Post[]     @relation("UserPosts", map: "UserPostsRelation")
   followers Follower[] @relation("UserFollowers", map: "UserFollowersRelation")
+
   following Follower[] @relation("UserFollowing", map: "UserFollowingRelation")
+
   bookmarks Bookmark[] @relation("UserBookmarks", map: "UserBookmarksRelation")
   claps     Clap[]
-  comments  Comment[]
 }
 
 model Post {
@@ -30,45 +30,29 @@ model Post {
   publishedDate DateTime     @default(now())
   updatedAt     DateTime     @updatedAt
   published     Boolean      @default(false)
-  author        User         @relation("UserPosts", fields: [authorId], references: [id], map: "PostAuthorRelation")
+  author        User         @relation("UserPosts", fields: [authorId], references: [id], map: "PostAuthorRelation", onDelete: Cascade)
   authorId      String
   img           String?
   bookmarks     Bookmark[]   @relation("PostBookmarks", map: "PostBookmarksRelation")
   tags          TagsOnPost[]
   claps         Clap[]
-  comments      Comment[]
 }
 
 model Clap {
-  id        String   @id @default(uuid())
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id        String  @id @default(uuid())
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId    String
-  post      Post     @relation(fields: [postId], references: [id], onDelete: Cascade)
+  post      Post    @relation(fields: [postId], references: [id], onDelete: Cascade)
   postId    String
-  comment   Comment? @relation(fields: [commentId], references: [id], onDelete: Cascade)
   commentId String?
 }
 
-model Comment {
-  id        String    @id @default(uuid())
-  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId    String
-  post      Post      @relation(fields: [postId], references: [id], onDelete: Cascade)
-  postId    String
-  message   String
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  parent    Comment?  @relation("ParentChild", fields: [parentId], references: [id], onDelete: Cascade)
-  children  Comment[] @relation("ParentChild")
-  parentId  String?
-  claps     Clap[]
-}
 
 model Follower {
   id         String @id @default(uuid())
-  follower   User   @relation("UserFollowing", fields: [followerId], references: [id], map: "FollowerRelation")
+  follower   User   @relation("UserFollowing", fields: [followerId], references: [id], map: "FollowerRelation", onDelete: Cascade)
   followerId String
-  followee   User   @relation("UserFollowers", fields: [followeeId], references: [id], map: "FolloweeRelation")
+  followee   User   @relation("UserFollowers", fields: [followeeId], references: [id], map: "FolloweeRelation", onDelete: Cascade)
   followeeId String
 
   @@unique([followerId, followeeId], map: "UniqueFollowers")
@@ -76,9 +60,9 @@ model Follower {
 
 model Bookmark {
   id     String @id @default(uuid())
-  user   User   @relation("UserBookmarks", fields: [userId], references: [id], map: "UserBookmarkRelation")
+  user   User   @relation("UserBookmarks", fields: [userId], references: [id], map: "UserBookmarkRelation", onDelete: Cascade)
   userId String
-  post   Post   @relation("PostBookmarks", fields: [postId], references: [id], map: "PostBookmarkRelation")
+  post   Post   @relation("PostBookmarks", fields: [postId], references: [id], map: "PostBookmarkRelation", onDelete: Cascade)
   postId String
 
   @@unique([userId, postId], map: "UniqueBookmarks")
@@ -87,14 +71,17 @@ model Bookmark {
 model Tag {
   id         String       @id @default(uuid())
   topic      String
-  tagId      String
-  tagsOnPost TagsOnPost[]
+  tagsOnPost TagsOnPost[] @relation("Tags", map: "TagsRelation")
+
+  @@unique([topic], map: "UniqueTags")
 }
 
 model TagsOnPost {
   id     String @id @default(uuid())
-  tag    Tag    @relation(fields: [tagId], references: [id])
+  tag    Tag    @relation("Tags", fields: [tagId], references: [id], map: "TagsOnPost", onDelete: Cascade)
   tagId  String
-  post   Post   @relation(fields: [postId], references: [id])
+  post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
   postId String
+
+  @@unique([tagId, postId], map: "UniqueTagsOnPost")
 }
