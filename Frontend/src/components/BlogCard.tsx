@@ -1,99 +1,197 @@
-import { useState } from "react";
-import profile from "../assets/profile-10.jpg";
-import img from "../assets/profile-9.jpg";
+import { useEffect, useState } from "react";
+
 import { Link } from "react-router-dom";
+import axios from "axios";
+import toast, { Toaster } from "react-hot-toast";
+import { formatDate } from "../uility/DateFormatter";
+import DomPurify from "dompurify";
+import { useBookmark } from "../hooks/bookmark";
+import { useFollowUser } from "../hooks/user";
 
 interface BlogProps {
+  id: string;
   title: string;
   content: string;
-  publishedDate: string;
-  authorName: string;
-  tag: string;
+  publishedDate: Date;
+  updatedAt: Date;
+  published: boolean;
+  authorId: string;
+  img: string;
+  tags: tag[];
+  clap: object[];
+  bookmarks: object[];
 }
+type tag = {
+  tagId: string;
+};
+type tagOnPost = {
+  topic: string;
+};
 export const BlogCard = ({
+  id,
   title,
-  authorName,
-  publishedDate,
   content,
-  tag,
+  publishedDate,
+  tags,
+  authorId,
+  img,
 }: BlogProps) => {
   const [more, setMore] = useState(false);
-  const [follow, setFollow] = useState(false);
+  const [author, setAuthor] = useState("");
+  const [authorImage, setAuthorImage] = useState("");
+  const [tagsOnPost, setTagsOnPost] = useState<tagOnPost[]>([]);
+  const [userAuthor, setUserAuthor] = useState(false);
+  const formattedDate = formatDate(publishedDate);
+  const headers = { Authorization: ` ${localStorage.getItem("token")}` };
+  const { followUser, isFollowing } = useFollowUser(authorId);
+  const backendUrl = import.meta.env.VITE_BACKEND_URL;
+
+  const handleMore = () => {
+    const currentUser = localStorage.getItem("user");
+    const userDetails = JSON.parse(currentUser || "{}");
+    const userName = userDetails.name;
+    if (author == userName) {
+      setUserAuthor(true);
+    }
+    setMore(!more);
+  };
+
+  const handleDelete = async () => {
+    try {
+      const res = await axios.delete(`${backendUrl}/blog/${id}`, { headers });
+      toast.success(res.data.message);
+      window.location.reload();
+    } catch (error) {
+      console.log("error", error);
+      toast.error("Error deleting post");
+    }
+  };
+
+  useEffect(() => {
+    async function getUser() {
+      try {
+        const postUser = await axios.get(`${backendUrl}/user/${authorId}`);
+        setAuthor(postUser.data.name);
+        setAuthorImage(postUser.data.img);
+      } catch (error) {
+        console.log("error fetching user data", error);
+        toast.error("Error fetching user data");
+      }
+    }
+    async function getBlog() {
+      try {
+        const tagPromises = tags.map(async (tag) => {
+          const singleTag = await axios.get(`${backendUrl}/tag/${tag.tagId}`, {
+            headers,
+          });
+          return singleTag.data;
+        });
+        const tagResults = await Promise.all(tagPromises);
+
+        setTagsOnPost(tagResults);
+      } catch (error) {
+        console.error("Error fetching blog data:", error);
+      }
+    }
+    getUser();
+    getBlog();
+  }, [authorId, tags]);
+  const { bookmark, isBookmarked } = useBookmark(id !== undefined ? id : "");
+  const sanitizedContent = DomPurify.sanitize(content);
 
   return (
     <div className="flex flex-col items-center ">
+      <Toaster />
       <div className=" flex  w-full justify-between">
         <div className="flex flex-col align-start py-5 w-3/4 gap-5">
-        <Link to={'/blog/:id'}>
-          <div className="flex flex-col gap-2">
-            <div className="flex items-center  gap-2">
-              <img
-                className="w-8 h-8 rounded-full cursor-pointer"
-                src={profile}
-                alt="Rounded avatar"
-              />
-              <div className=" font-semibold cursor-pointer ">{authorName}</div>
-              <div className="text-2xl text-gray-400 relative bottom-1.5">
-                .
+          <Link to={`/blog/${id}`}>
+            <div className="flex flex-col gap-2">
+              <div className="flex items-center  gap-2">
+                {authorImage ? (
+                  <img
+                    className="w-8 h-8 rounded-full cursor-pointer"
+                    src={authorImage}
+                    alt="Rounded avatar"
+                  />
+                ) : (
+                  <span className=" flex flex-col items-center justify-center  h-8 w-8 cursor-pointer rounded-full  bg-slate-300  ">
+                    <i className="fa-regular fa-user text-lg   font-normal text-gray-600"></i>
+                  </span>
+                )}
+                <div className=" font-semibold cursor-pointer ">{author}</div>
+                <div className="text-2xl text-gray-400 relative bottom-1.5">
+                  .
+                </div>
+                <div className="text-gray-400 ">{formattedDate} </div>
               </div>
-              <div className="text-gray-400 ">{publishedDate} </div>
-            </div>
-            <div className="flex flex-col gap-1.5">
-              <div className="font-bold text-xl  cursor-pointer">{title} </div>
-              <div className="font-serif cursor-pointer">
-                {content.slice(0, 200) + "..."}
+              <div className="flex flex-col gap-1.5">
+                <div className="font-extrabold text-xl  cursor-pointer">
+                  {title}
+                </div>
+                <div
+                  dangerouslySetInnerHTML={{
+                    __html: sanitizedContent.slice(0, 200) + "...",
+                  }}
+                  className="font-serif cursor-pointer line-clamp-2"
+                />
               </div>
             </div>
-          </div>
           </Link>
           <div className="flex items-center w-full justify-between">
             <div className="flex flex-row items-center gap-3">
-              <span className="bg-gray-200 px-2 cursor-pointer py-1 rounded-3xl text-sm ">
-                {tag}
-              </span>
+              {tagsOnPost.map((tag) => {
+                return (
+                  <span className="bg-gray-200 px-2 cursor-pointer py-1 rounded-3xl text-sm ">
+                    {tag.topic}
+                  </span>
+                );
+              })}
               <span className="text-gray-400 text-sm cursor-pointer">
                 {`${Math.ceil(content.length / 100)} min read`}{" "}
               </span>
             </div>
-            <span className="flex items-center gap-3 text-gray-400 h-5 relative cursor-pointer">
-              {follow ? (
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  onClick={() => setFollow(!follow)}
-                  fill="black"
-                  height="20px"
-                  width="20px"
-                  viewBox="0 0 384 512"
-                >
-                  <path d="M0 48V487.7C0 501.1 10.9 512 24.3 512c5 0 9.9-1.5 14-4.4L192 400 345.7 507.6c4.1 2.9 9 4.4 14 4.4c13.4 0 24.3-10.9 24.3-24.3V48c0-26.5-21.5-48-48-48H48C21.5 0 0 21.5 0 48z" />
-                </svg>
+            <span className="flex items-center gap-7 text-gray-400 h-5 relative cursor-pointer">
+              {isBookmarked ? (
+                <i
+                  onClick={() => bookmark(id !== undefined ? id : "")}
+                  className="fa-solid fa-bookmark cursor-pointer text-black"
+                ></i>
               ) : (
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  onClick={() => setFollow(!follow)}
-                  fill="gray"
-                  height="20px"
-                  width="20px"
-                  viewBox="0 0 384 512"
-                >
-                  <path d="M0 48C0 21.5 21.5 0 48 0l0 48V441.4l130.1-92.9c8.3-6 19.6-6 27.9 0L336 441.4V48H48V0H336c26.5 0 48 21.5 48 48V488c0 9-5 17.2-13 21.3s-17.6 3.4-24.9-1.8L192 397.5 37.9 507.5c-7.3 5.2-16.9 5.9-24.9 1.8S0 497 0 488V48z" />
-                </svg>
+                <i
+                  onClick={() => bookmark(id !== undefined ? id : "")}
+                  className="fa-regular fa-bookmark cursor-pointer text-gray-500 hover:text-black"
+                ></i>
               )}
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                onClick={() => setMore(!more)}
-                fill="gray"
-                height="20px"
-                width="20px"
-                viewBox="0 0 448 512"
-              >
-                <path d="M8 256a56 56 0 1 1 112 0A56 56 0 1 1 8 256zm160 0a56 56 0 1 1 112 0 56 56 0 1 1 -112 0zm216-56a56 56 0 1 1 0 112 56 56 0 1 1 0-112z" />
-              </svg>
+
+              <div className="group relative">
+                <i
+                  onClick={handleMore}
+                  className="fa-solid fa-ellipsis cursor-pointer text-gray-500 hover:text-black text-xl"
+                ></i>
+                <div className="hidden group-hover:block flex-col items-center  bg-black absolute px-3 py-1 text-white bottom-7 right-[-20px] rounded-lg">
+                  <span className="absolute  bg-black h-3 w-3 rotate-45 left-6 bottom-[-6px]"></span>
+                  more
+                </div>
+              </div>
               {more && (
-                <div
-                  className="flex flex-col justify-center bg-slate-100 shadow-md  absolute bottom-4 left-5 text-black  text-sm  rounded-xl  font-semibold w-28 h-8  text-center"
-                >
-                  Follow Author
+                <div className=" flex  bg-slate-200 shadow-md  absolute bottom-7 left-1 text-black  text-sm  rounded-xl  font-semibold  py-2 px-4 ">
+                  <span className="absolute  bg-slate-200 h-4 w-4 rotate-45 left-9 bottom-[-10px]"></span>
+                  {userAuthor ? (
+                    <span className="flex flex-col  gap-2 whitespace-nowrap">
+                      <Link to={`/edit-blog/${id}`}>
+                        <span>Edit Post</span>
+                      </Link>
+                      <span onClick={handleDelete}>Delete post</span>
+                    </span>
+                  ) : (
+                    <span
+                      onClick={() => followUser(authorId)}
+                      className="text-center whitespace-nowrap"
+                    >
+                      {" "}
+                      {isFollowing ? "Unfollow author" : "Follow author"}{" "}
+                    </span>
+                  )}
                 </div>
               )}
             </span>

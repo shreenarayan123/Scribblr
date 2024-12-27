@@ -4,31 +4,29 @@ import { Navbar } from "../components/Navbar";
 import { useEffect, useState } from "react";
 import { Preview } from "../components/Preview";
 import { Blog } from "../context/Context";
+import { useParams } from "react-router-dom";
+import { useSingleBlog } from "../hooks/blog";
 
-export const NewStory = () => {
-  const { currentUser, setBlogContent } = Blog();
+export const EditBlog = () => {
+  const { setBlogContent } = Blog();
 
-  const [title, setTitle] = useState(localStorage.getItem("title") || "");
-  const [content, setContent] = useState(
-    localStorage.getItem("content") || " "
-  );
-  const [saved, setSaved] = useState(false);
+  const { id } = useParams();
+  const { blog } = useSingleBlog(id || "");
+
+  const [title, setTitle] = useState("");
+  const [content, setContent] = useState("");
+
+  useEffect(() => {
+    if (blog) {
+      setTitle(blog.title);
+      setContent(blog.content);
+    }
+  }, [blog]);
 
   useEffect(() => {
     if (title !== "" && content !== "") {
       setBlogContent(true);
     }
-  }, [title, content]);
-
-  useEffect(() => {
-    const saveDraft = () => {
-      localStorage.setItem(
-        "newStory",
-        JSON.stringify({ title: title, content: content })
-      );
-      setSaved(true);
-    };
-    setTimeout(saveDraft, 5000);
   }, [title, content]);
 
   const { preview } = Blog();
@@ -56,10 +54,6 @@ export const NewStory = () => {
     <div className="flex flex-col items-center ">
       <Navbar />
       <div className="flex w-4/5 flex-col py-10 gap-5">
-        <span>
-          Draft in <span className="font-medium">{currentUser?.name}</span>{" "}
-          {saved ? "saved" : "saving..."}
-        </span>
         <input
           value={title}
           onChange={(e) => setTitle(e.target.value)}
