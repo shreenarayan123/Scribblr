@@ -1,4 +1,20 @@
-@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wdth,wght@0,62.5..100,100..900;1,62.5..100,100..900&display=swap");
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.bottom-custom {
+  top: -10px;
+}
+
+.ql-editor {
+  @apply font-serif text-lg !p-0 md:p-4;
+}
+
+.ql-editor.ql-blank::before {
+  @apply inset-0 not-italic text-gray-400 font-light text-xl;
+}
+
+.react-tagsinput .react-tagsinput-tag {
+  @apply bg-gray-200 text-black rounded-sm;
+}
