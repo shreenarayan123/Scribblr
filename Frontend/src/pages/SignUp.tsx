@@ -74,10 +74,12 @@ const SignUp = () => {
       <Toaster position="top-center" reverseOrder={false} />
       <div className="h-screen flex justify-center flex-col">
         <div className=" backdrop-blur-sm bg-white/40 w-96 p-7 rounded-xl shadow-[0_35px_60px_-15px_rgba(0,0,0,0.3)]">
+            <Link to={"/"}>
           <div className="flex items-center justify-center gap-4 pb-4">
             <span className="text-3xl font-bold">Join</span>
             <img src={Logo} alt="logoImage" className="h-12" />
           </div>
+            </Link>
           <div className="text-slate-500 text-center  ">
             Already have an account ?{" "}
             <Link className="underline" to={"/signin"}>

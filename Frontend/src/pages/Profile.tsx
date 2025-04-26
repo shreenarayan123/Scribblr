@@ -35,9 +35,9 @@ export const Profile = () => {
   const navRef = useRef<HTMLDivElement>(null);
 
   return (
-    <div className="md:flex flex-col items-center   sm:w-full sm:justify-center">
+    <div className="md:flex flex-col items-center   w-full justify-center">
       <Navbar />
-      <div className="flex  justify-center w-full ">
+      <div className="flex  justify-center w-full px-5">
         <div className="flex flex-col mt-32  overflow-y-auto  md:w-3/5 sm:w-full sm:px-10">
           <div className="flex   sm:justify-between sm:w-full gap-4">
             <div className="flex  flex-row items-center gap-3">
@@ -49,7 +49,7 @@ export const Profile = () => {
                 Followings ({user?.following?.length})
               </span>
             </div>
-            <span className="sm:flex items-center cursor-pointer md:hidden">
+            <span className="flex items-center cursor-pointer md:hidden">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 onClick={() => setMore(!more)}
@@ -100,7 +100,7 @@ export const Profile = () => {
             <selectedTag.comp />
           </div>
         </div>
-        <div className="md:flex flex-col   md:w-1/5  gap-7 pl-5 w-full overflow-y-hidden py-10  border-l-2  sm:hidden">
+        <div className="md:flex flex-col   md:w-1/5  gap-7 pl-5 w-full overflow-y-hidden py-10  border-l-2 hidden">
           <div className="flex flex-col items-start gap-1 w-full">
             <span className="flex items-center gap-3">
               {user.img ? (

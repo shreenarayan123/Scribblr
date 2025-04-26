@@ -6,23 +6,23 @@ import { Link } from "react-router-dom";
 export const GetBanner = () => {
   return (
     <div className="flex  flex-col  items-center justify-center  relative gap-5 bg-red-100 w-full  h-full  ">
-      <div className="md:flex flex-row absolute top-0 right-0 sm:hidden items-center gap-5 ">
+      <div className="md:flex flex-row absolute top-0 right-0 hidden items-center gap-5 ">
         <div className="flex  itmes-center justify-center gap-5">
           <span className="font-sans text-base font-medium">1.3k stories</span>
           <span className="bg-gray-300 relative bottom-2 cursor-pointer p-3 rounded-3xl text-sm flex font-medium">
             mental health
           </span>
         </div>
-        <img src={mentalhealth} className="h-60" alt="story1" />
+        <img src={mentalhealth} className="h-60 hidden md:block" alt="story1" />
       </div>
       <div className="flex flex-col items-center gap-9">
-        <span className="font-serif text-8xl flex flex-col items-center font-medium">
+        <span className="font-serif md:text-8xl text-5xl flex flex-col items-center font-medium">
           <span> Personal </span>
 
           <span> insights & ideas</span>
         </span>
 
-        <span className="font-sans text-2xl">
+        <span className="font-sans text-2xl text-center">
           An place where diverse voices share stories and insights.
         </span>
         <Link to={"/signup"}>
@@ -34,17 +34,17 @@ export const GetBanner = () => {
           </button>
         </Link>
       </div>
-      <div className="md:flex flex-row absolute sm:hidden bottom-0 right-0 items-center gap-5 ">
+      <div className="md:flex flex-row absolute hidden bottom-0 right-0 items-center gap-5 ">
         <div className="flex itmes-center justify-center gap-5">
           <span className="font-sans text-base font-medium">1.8k stories</span>
           <span className="bg-gray-300 relative bottom-2 cursor-pointer p-3 rounded-3xl text-sm flex font-medium">
             bussiness
           </span>
         </div>
-        <img src={business} className="w-60" alt="story1" />
+        <img src={business} className="w-60 hidden md:block" alt="story1" />
       </div>
-      <div className="md:flex flex-row absolute sm:hidden bottom-1/2 left-0 items-center gap-5 ">
-        <img src={ai} className="w-60" alt="story1" />
+      <div className="md:flex flex-row absolute hidden bottom-1/2 left-0 items-center gap-5 ">
+        <img src={ai} className="w-60 hidden md:block" alt="story1" />
         <div className="flex itmes-center justify-center gap-5">
           <span className="bg-gray-300 cursor-pointer relative bottom-2 p-3 rounded-3xl text-sm flex font-medium">
             Ai

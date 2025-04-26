@@ -92,9 +92,9 @@ const Blogs = () => {
   }, [filter, searchBlog, blogs]);
 
   return (
-    <div className="md:flex flex-col items-center sm:w-full sm:justify-center ">
+    <div className="md:flex flex-col items-center w-full justify-center ">
       <Navbar />
-      <div className="flex w-[90%]  justify-center gap-5 ">
+      <div className="flex w-[90%]  justify-center gap-5 px-5  pb-5">
         <div className="flex flex-col items-center overflow-y-auto scrollbar-hide h-screen md:w-3/5 sm:w-full sm:px-10">
           <TagsBar />
 

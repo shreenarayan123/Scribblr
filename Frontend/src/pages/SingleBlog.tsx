@@ -75,7 +75,7 @@ const SingleBlog = () => {
   return (
     <div className="h-screen place-items-center grid">
       <Navbar />
-      <div className="md:w-3/5 sm:w-4/5 py-10 h-screen">
+      <div className="md:w-3/5 w-4/5 py-10 h-screen">
         {loading ? (
           <Skeleton height={40} width={400} />
         ) : (
@@ -141,7 +141,7 @@ const SingleBlog = () => {
                 className="fa-solid fa-ellipsis cursor-pointer text-gray-500 hover:text-black"
               ></i>
               {more && (
-                <div className="flex flex-col flex-start gap-3 bg-slate-200 shadow-md  absolute top-[180px] md:right-56 sm:right-1 text-black  text-sm  rounded-xl  font-semibold  py-2 px-4 w-32">
+                <div className="flex flex-col flex-start gap-3 bg-slate-200 shadow-md  absolute top-[180px] md:right-56 right-1 text-black  text-sm  rounded-xl  font-semibold  py-2 px-4 w-32">
                   <span className="absolute translate-y-10  bg-slate-200 h-5 w-5 rotate-45 left-7  bottom-7 "></span>
                   {userAuthor ? (
                     <>

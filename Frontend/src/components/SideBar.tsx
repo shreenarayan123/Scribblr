@@ -24,7 +24,7 @@ const Author = React.memo(
     }, [error]);
 
     return (
-      <div className="flex flex-col items-center">
+      <div className="flex flex-col items-center ">
         <div className="flex items-center justify-between w-full">
           <div className="flex gap-4 items-center">
             {authorImg ? (
@@ -84,7 +84,7 @@ export const SideBar = React.memo(() => {
   };
 
   return (
-    <div className="md:flex flex-col md:w-[25%] gap-12 pl-5 w-full overflow-y-hidden py-10 border-l-2 sm:hidden">
+    <div className="md:flex md:flex-col md:w-[25%] gap-12 pl-5 w-full overflow-y-hidden py-10 border-l-2 hidden">
       <div className="flex flex-col gap-4 flex-start w-full">
         <span className="font-semibold text-base">Recommended Topics</span>
         {loading ? (
@@ -111,21 +111,24 @@ export const SideBar = React.memo(() => {
           </div>
         )}
       </div>
-      <div className="flex flex-col flex-start gap-4">
+      <div className="flex flex-col flex-start gap-5">
         <span className="font-semibold text-base">Who to follow</span>
         {loading ? (
           <SidebarLoader />
         ) : (
           <div>
-            {filteredUsers.map((user: any, index) => (
-              <Author
-                key={index}
-                authorName={user.name}
-                authorBio={user.bio}
-                authorImg={user.img}
-                authorId={user.id}
-              />
-            ))}
+            {filteredUsers
+              .sort(() => 0.5 - Math.random()) // Shuffle the array
+              .slice(0, 4) // Take only 4 random users
+              .map((user: any, index) => (
+          <Author
+            key={index}
+            authorName={user.name}
+            authorBio={user.bio}
+            authorImg={user.img}
+            authorId={user.id}
+          />
+              ))}
           </div>
         )}
       </div>
@@ -151,3 +154,4 @@ export const SideBar = React.memo(() => {
     </div>
   );
 });
+                                                                                           
